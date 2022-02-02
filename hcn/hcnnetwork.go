@@ -453,7 +453,9 @@ func (network *HostComputeNetwork) Create() (*HostComputeNetwork, error) {
 		for _, subnet := range ipam.Subnets {
 			if subnet.IpAddressPrefix != "" {
 				hasDefault := false
+				needsDefault := false
 				for _, route := range subnet.Routes {
+					needsDefault = true
 					if route.NextHop == "" {
 						return nil, errors.New("network create error, subnet has address prefix but no gateway specified")
 					}
@@ -461,7 +463,7 @@ func (network *HostComputeNetwork) Create() (*HostComputeNetwork, error) {
 						hasDefault = true
 					}
 				}
-				if !hasDefault {
+				if !hasDefault && needsDefault {
 					return nil, errors.New("network create error, no default gateway")
 				}
 			}

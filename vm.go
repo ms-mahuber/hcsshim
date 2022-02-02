@@ -54,6 +54,7 @@ type VirtualMachineOptions struct {
 	VnicId             string
 	MacAddress         string
 	UseGuestConnection bool
+	UseVsock           bool
 	AllowOvercommit    bool
 }
 
@@ -132,7 +133,7 @@ func CreateVirtualMachineSpec(opts *VirtualMachineOptions) (*VirtualMachineSpec,
 
 	if opts.UseGuestConnection {
 		spec.VirtualMachine.GuestConnection = &hcsschema.GuestConnection{
-			UseVsock:            true,
+			UseVsock:            opts.UseVsock,
 			UseConnectedSuspend: true,
 		}
 	}
