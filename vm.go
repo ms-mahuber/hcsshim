@@ -71,10 +71,12 @@ type VirtualMachineSpec struct {
 func CreateVirtualMachineSpec(opts *VirtualMachineOptions) (*VirtualMachineSpec, error) {
 	// Ensure the VM has access, we use opts.Id to create VM
 	if err := wclayer.GrantVmAccess(opts.Id, opts.VhdPath); err != nil {
-		return nil, err
+		// TODO we need to sort this out - if we error here, VMs won't come up anymore after reboot
+		//return nil, fmt.Errorf("Failed to grant VM access to VHD file, error: %s", err)
 	}
 	if err := wclayer.GrantVmAccess(opts.Id, opts.IsoPath); err != nil {
-		return nil, err
+		//return nil, fmt.Errorf("Failed to grant VM access to ISO file, error: %s", err)
+		err = nil
 	}
 
 	spec := &hcsschema.ComputeSystem{
