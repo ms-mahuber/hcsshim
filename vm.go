@@ -71,12 +71,10 @@ type VirtualMachineSpec struct {
 func CreateVirtualMachineSpec(opts *VirtualMachineOptions) (*VirtualMachineSpec, error) {
 	// Ensure the VM has access, we use opts.Id to create VM
 	if err := wclayer.GrantVmAccess(opts.Id, opts.VhdPath); err != nil {
-		// TODO we need to sort this out - if we error here, VMs won't come up anymore after reboot
-		//return nil, fmt.Errorf("Failed to grant VM access to VHD file, error: %s", err)
+		return nil, fmt.Errorf("Failed to grant VM access to VHD file, error: %s", err)
 	}
 	if err := wclayer.GrantVmAccess(opts.Id, opts.IsoPath); err != nil {
-		//return nil, fmt.Errorf("Failed to grant VM access to ISO file, error: %s", err)
-		err = nil
+		return nil, fmt.Errorf("Failed to grant VM access to ISO file, error: %s", err)
 	}
 
 	spec := &hcsschema.ComputeSystem{
@@ -365,7 +363,7 @@ func (vm *VirtualMachineSpec) HotDetachEndpoint(endpoint *hcn.HostComputeEndpoin
 	// Hot detach an endpoint from the compute system
 	request := hcsschema.ModifySettingRequest{
 		RequestType:  requesttype.Remove,
-		ResourcePath: path.Join("VirtualMachine/Devices/NetworkAdapters", endpoint.Id),
+		ResourcePath: path.Join("VirtualMachine/Devices/NetworkAdapters", endpoint.Name),
 		Settings: hcsschema.NetworkAdapter{
 			EndpointId: endpoint.Id,
 			MacAddress: endpoint.MacAddress,
@@ -383,7 +381,7 @@ func (vm *VirtualMachineSpec) hotAttachEndpoint(ctx context.Context, system *hcs
 	// Hot attach an endpoint to the compute system
 	request := hcsschema.ModifySettingRequest{
 		RequestType:  requesttype.Add,
-		ResourcePath: path.Join("VirtualMachine/Devices/NetworkAdapters", endpoint.Id),
+		ResourcePath: path.Join("VirtualMachine/Devices/NetworkAdapters", endpoint.Name),
 		Settings: hcsschema.NetworkAdapter{
 			EndpointId: endpoint.Id,
 			MacAddress: endpoint.MacAddress,
